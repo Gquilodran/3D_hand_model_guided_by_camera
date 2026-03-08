@@ -1,5 +1,6 @@
 import cv2
 import numpy as np
+import detec_objet
 
 def evalia_oscuridad(matriz):
     matriz_intensidad = np.mean(matriz,2)
@@ -7,12 +8,15 @@ def evalia_oscuridad(matriz):
     return brillo
 
 def usar_camara():
+    model = detec_objet.init_Yolo()
     count = 0
     pausa = False
     last_frame = None
     cap = cv2.VideoCapture(0)
+    cap.set(3, 1280)
+    cap.set(4, 720)
     if not cap.isOpened():
-        print("❌ No se pudo acceder a la cámara.")
+        print("No se pudo acceder a la cámara.")
         return 
     print("Presiona 'q' para salir.")
 
@@ -26,7 +30,7 @@ def usar_camara():
         else:
             frame = last_frame
         frame = cv2.flip(frame,1)
-
+        
         # Mostrar el frame en una ventana
         cv2.imshow("Camara en vivo", frame)
         brillo = evalia_oscuridad(frame)
@@ -40,7 +44,7 @@ def usar_camara():
             break
         if key == ord('w'):
             count=count+1
-            cv2.imwrite(f"frames/frame_guardado{count}.png", frame)
+            cv2.imwrite(f"frames/frame_guardado{count}.png", detec_objet.deteccion(model, frame))
         if key == ord('p'):
             pausa = not pausa
 
